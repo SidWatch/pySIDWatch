@@ -93,15 +93,16 @@ class SidWatch:
         """
 
         self.AutoUpload = values_dictionary["AutoUpload"]
-        self.BucketName = values_dictionary["BucketName"]
-        self.AccessKey = values_dictionary["AccessKey"]
-        self.SecretKey = values_dictionary["SecretKey"]
         self.DataFolder = values_dictionary["DataFolder"]
         self.ReadingPerFile = values_dictionary["ReadingPerFile"]
         self.NFFT = values_dictionary["NFFT"]
         self.SaveRawData = values_dictionary["SaveRawData"]
         self.SaveFrequencies = values_dictionary["SaveFrequencies"]
         self.SaveStationData = values_dictionary["SaveStationData"]
+
+        self.Username = values_dictionary["Username"]
+        self.Password = values_dictionary["Password"]
+        self.SidWatchServerUrl = values_dictionary["SidWatchServerUrl"]
 
         if (self.NFFT is None) or (self.NFFT == 0) :
             self.NFFT = 1024

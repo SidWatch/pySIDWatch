@@ -2,6 +2,7 @@ __author__ = 'briannelson'
 from SID.Utilities import HDF5Utility
 from SID.Utilities import DateUtility
 from SID.Utilities import FrequencyUtility
+from SID.ServerAPI import SidWatchAPI
 
 from Audio.Utilities import Utilities as AudioUtilities
 import datetime as dt
@@ -112,6 +113,12 @@ class SendToSidWatchServerController:
 
     def start(self):
         self.Done = False
+
+        api = SidWatchAPI(self.Config)
+        temp = api.get_upload_credentials()
+
+
+
 
         threadtime.sleep(.1)
         pass
