@@ -117,10 +117,16 @@ class SendToSidWatchServerController:
         api = SidWatchAPI(self.Config)
         temp = api.get_upload_credentials()
 
+        folder_name = self.Config.SidWatch.DataFolder;
 
+        while not self.Done:
+            items = os.listdir(folder_name)
 
+            for item in items:
+                if os.path.isfile(item) and item.endswith('.h5'):
+                    
 
-        threadtime.sleep(.1)
+            threadtime.sleep(5)
         pass
 
     def stop(self):

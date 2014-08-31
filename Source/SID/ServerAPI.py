@@ -16,6 +16,10 @@ class SidWatchAPI:
         url = self.Config.SidWatch.SidWatchServerUrl + "uploadaccess"
 
         http = urllib3.PoolManager()
-        response = http.request('GET', url)
+
+        headers = { 'sidwatch-emailaddress':'brian@treegecko.com', 'sidwatch-password':'tester' }
+        response = http.request('GET', url, headers)
+
+        print(response.data)
 
         pass
