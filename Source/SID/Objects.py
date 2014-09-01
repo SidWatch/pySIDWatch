@@ -93,6 +93,7 @@ class SidWatch:
         """
 
         self.AutoUpload = values_dictionary["AutoUpload"]
+        self.DeleteAfterUpload = values_dictionary["DeleteAfterUpload"]
         self.DataFolder = values_dictionary["DataFolder"]
         self.ReadingPerFile = values_dictionary["ReadingPerFile"]
         self.NFFT = values_dictionary["NFFT"]

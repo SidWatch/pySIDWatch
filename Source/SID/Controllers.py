@@ -4,6 +4,10 @@ from SID.Utilities import DateUtility
 from SID.Utilities import FrequencyUtility
 from SID.ServerAPI import SidWatchAPI
 
+from boto.s3.connection import S3Connection
+from boto.s3.key import Key
+from boto.s3.connection import OrdinaryCallingFormat
+
 from Audio.Utilities import Utilities as AudioUtilities
 import datetime as dt
 import os
@@ -115,18 +119,64 @@ class SendToSidWatchServerController:
         self.Done = False
 
         api = SidWatchAPI(self.Config)
-        temp = api.get_upload_credentials()
+        s3_keys = api.get_upload_credentials()
 
-        folder_name = self.Config.SidWatch.DataFolder;
+        if s3_keys is not None:
+            folder_name = self.Config.SidWatch.DataFolder;
 
-        while not self.Done:
-            items = os.listdir(folder_name)
+            while not self.Done:
+                print('Checking for files')
 
-            for item in items:
-                if os.path.isfile(item) and item.endswith('.h5'):
-                    
+                all_items = os.listdir(folder_name)
 
-            threadtime.sleep(5)
+                items_to_process = []
+
+                for item in all_items:
+                    if os.path.isfile(folder_name + item) and item.endswith('.h5'):
+                        items_to_process.append(item)
+
+                print('Total items found - {0}, Items to process - {1}'.format(len(all_items), len(items_to_process)))
+
+                if len(items_to_process) > 0:
+                    bucketName = s3_keys['Bucket']
+                    print("Sending data to {0} bucket".format(bucketName))
+
+                    connection = S3Connection(s3_keys['AccessKey'], s3_keys['SecretKey'], calling_format=OrdinaryCallingFormat())
+                    bucket = connection.get_bucket(bucketName)
+
+                    if bucket is not None:
+                        for item in items_to_process:
+                            item_key = bucket.get_key(item)
+
+                            if item_key is None:
+                                print('Sending {0} to server'.format(item))
+
+                                item_key = Key(bucket)
+                                item_key.key = item
+                                item_key.set_contents_from_filename(folder_name + item)
+
+                                if self.Config.SidWatch.DeleteAfterUpload=='yes':
+                                    os.remove(folder_name + item)
+                                else:
+                                    ##move to uploaded folder
+                                    upload_folder = folder_name + 'uploaded'
+
+                                    if not os.path.exists(upload_folder):
+                                        os.makedirs(upload_folder)
+
+                                    os.rename(folder_name + item, upload_folder + '/' + item)
+
+                            else:
+                                print('File {0} already exist on server.  Will try again later.'.format(item))
+
+                    else:
+                        print('Bucket {0} not found'.format(bucketName))
+
+                print('Sleeping for 60 seconds')
+                threadtime.sleep(60)
+        else:
+            print('Bad user or password information provided.')
+
         pass
 
     def stop(self):

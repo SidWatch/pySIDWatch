@@ -1,6 +1,5 @@
 __author__ = 'briannelson'
-import urllib3
-
+import requests
 
 class SidWatchAPI:
     def __init__(self, config):
@@ -13,13 +12,18 @@ class SidWatchAPI:
         username = self.Config.SidWatch.Username
         password = self.Config.SidWatch.Password
 
-        url = self.Config.SidWatch.SidWatchServerUrl + "uploadaccess"
+        url = self.Config.SidWatch.SidWatchServerUrl + "accesskey"
 
-        http = urllib3.PoolManager()
+        custom_headers = { 'sidwatch-emailaddress':'brian@treegecko.com', 'sidwatch-password':'tester' }
+        response = requests.get(url, headers=custom_headers)
 
-        headers = { 'sidwatch-emailaddress':'brian@treegecko.com', 'sidwatch-password':'tester' }
-        response = http.request('GET', url, headers)
+        access_key = response.json()
 
-        print(response.data)
+        if ('error' in access_key):
+            return None
+        else:
+            ak = access_key['accesskey']
+            sk = access_key['secretkey']
+            bucket = access_key['bucketname']
 
-        pass
+            return {'AccessKey':ak, 'SecretKey':sk, 'Bucket':bucket }
