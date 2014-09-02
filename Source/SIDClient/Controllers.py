@@ -1,17 +1,18 @@
 __author__ = 'briannelson'
-from SID.Utilities import HDF5Utility
-from SID.Utilities import DateUtility
-from SID.Utilities import FrequencyUtility
-from SID.ServerAPI import SidWatchAPI
+import datetime as dt
+import os
+import time as threadtime
 
 from boto.s3.connection import S3Connection
 from boto.s3.key import Key
 from boto.s3.connection import OrdinaryCallingFormat
 
+from SID.Utilities import HDF5Utility
+from SID.Utilities import DateUtility
+from SID.Utilities import FrequencyUtility
+from SIDRest.ServerAPI import SidWatchAPI
 from Audio.Utilities import Utilities as AudioUtilities
-import datetime as dt
-import os
-import time as threadtime
+
 
 class SidDataController:
     def __init__(self, config):
