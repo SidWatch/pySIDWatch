@@ -91,11 +91,13 @@ class HDF5Utility:
             frequency_spectrum_data_group = data_file.get("frequency_spectrum_data")
             if frequency_spectrum_data_group is None:
                 frequency_spectrum_data_group = data_file.create_group("frequency_spectrum_data")
+                frequency_spectrum_data_group.attrs["MonitorId"] = site_config.MonitorId
 
         if config.SidWatch.SaveStationData:
             stations_group = data_file.get("monitored_stations")
             if stations_group is None:
                 stations_group = data_file.create_group("monitored_stations")
+                stations_group.attrs["MonitorId"] = site_config.MonitorId
 
                 for station in config.Stations:
                     station_group = stations_group.get(station.CallSign)
@@ -103,7 +105,6 @@ class HDF5Utility:
                     if station_group is None:
                         station_group = stations_group.create_group(station.CallSign)
                         station_group.attrs["CallSign"] = station.CallSign
-                        station_group.attrs["Color"] = station.Color
                         station_group.attrs["Frequency"] = station.Frequency
                         station_group.attrs["MonitoredBin"] = station.MonitoredBin
 
