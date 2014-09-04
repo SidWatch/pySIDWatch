@@ -52,7 +52,7 @@ class SidDataController:
                     filename_temp = filename_prefix + ".tmp"
                     filename_final = filename_prefix + ".h5"
 
-                    result = HDF5Utility.open_file(filename_temp, self.Config)
+                    result = HDF5Utility.open_file(filename_temp, current_time, self.Config)
 
                     data_file = result["File"]
                     raw_data_group = result["RawDataGroup"]
@@ -63,6 +63,7 @@ class SidDataController:
 
                 result = AudioUtilities.get_second_of_audio(self.Config.Audio)
 
+                #time is already in UTC there is no need to convert
                 time = result["Time"]
                 data = result["Data"]
 

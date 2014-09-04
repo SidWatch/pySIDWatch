@@ -64,11 +64,18 @@ class HDF5Utility:
         file.close()
 
     @staticmethod
-    def open_file(filename, config):
+    def open_file(filename, current_time, config):
         site_config = config.Site
         audio_config = config.Audio
 
         data_file = h5py.File(filename, "a")
+        data_file.attrs["MonitorId"] = site_config.MonitorId
+        data_file.attrs["StationName"] = site_config.Name
+        data_file.attrs["Latitude"] = site_config.Latitude
+        data_file.attrs["Longitude"] = site_config.Longitude
+        data_file.attrs["UtcOffset"] = site_config.UtcOffset
+        data_file.attrs["Timezone"] = site_config.Timezone
+        data_file.attrs["CreatedDateTime"] = current_time.isoformat()
 
         raw_data_group = None
         frequency_spectrum_data_group = None
@@ -78,12 +85,6 @@ class HDF5Utility:
             raw_data_group = data_file.get("raw_sid_data")
             if raw_data_group is None:
                 raw_data_group = data_file.create_group("raw_sid_data")
-                raw_data_group.attrs["StationName"] = site_config.Name
-                raw_data_group.attrs["MonitorId"] = site_config.MonitorId
-                raw_data_group.attrs["Latitude"] = site_config.Latitude
-                raw_data_group.attrs["Longitude"] = site_config.Longitude
-                raw_data_group.attrs["UtcOffset"] = site_config.UtcOffset
-                raw_data_group.attrs["Timezone"] = site_config.Timezone
                 raw_data_group.attrs["SamplingRate"] = audio_config.SamplingRate
                 raw_data_group.attrs["SamplingFormat"] = audio_config.SamplingFormat
 
@@ -91,13 +92,12 @@ class HDF5Utility:
             frequency_spectrum_data_group = data_file.get("frequency_spectrum_data")
             if frequency_spectrum_data_group is None:
                 frequency_spectrum_data_group = data_file.create_group("frequency_spectrum_data")
-                frequency_spectrum_data_group.attrs["MonitorId"] = site_config.MonitorId
+                frequency_spectrum_data_group.attrs["NFFT"] = config.SidWatch.NFFT
 
         if config.SidWatch.SaveStationData:
             stations_group = data_file.get("monitored_stations")
             if stations_group is None:
                 stations_group = data_file.create_group("monitored_stations")
-                stations_group.attrs["MonitorId"] = site_config.MonitorId
 
                 for station in config.Stations:
                     station_group = stations_group.get(station.CallSign)
@@ -107,6 +107,7 @@ class HDF5Utility:
                         station_group.attrs["CallSign"] = station.CallSign
                         station_group.attrs["Frequency"] = station.Frequency
                         station_group.attrs["MonitoredBin"] = station.MonitoredBin
+                        station_group.attrs["NFFT"] = config.SidWatch.NFFT
 
         return { "File": data_file,
                  "RawDataGroup": raw_data_group,
