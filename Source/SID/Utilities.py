@@ -93,6 +93,8 @@ class HDF5Utility:
             if frequency_spectrum_data_group is None:
                 frequency_spectrum_data_group = data_file.create_group("frequency_spectrum_data")
                 frequency_spectrum_data_group.attrs["NFFT"] = config.SidWatch.NFFT
+                frequency_spectrum_data_group.attrs["SamplingRate"] = audio_config.SamplingRate
+                frequency_spectrum_data_group.attrs["SamplingFormat"] = audio_config.SamplingFormat
 
         if config.SidWatch.SaveStationData:
             stations_group = data_file.get("monitored_stations")
