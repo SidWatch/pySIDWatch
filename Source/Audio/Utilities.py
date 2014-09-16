@@ -11,49 +11,6 @@ class Utilities:
         Constructor
         """
 
-    @staticmethod
-    def get_second_of_audio(audio_config):
-        CHUNK = 8000
-
-        audio_device = pyaudio.PyAudio()
-        CHUNKS_PER_SECOND = int(audio_config.SamplingRate / CHUNK)
-
-        audio_output = np.zeros(audio_config.SamplingRate, audio_config.NumberFormat)
-
-        try:
-            audio_device = pyaudio.PyAudio()
-
-            stream = audio_device.open(format=audio_config.AudioFormat,
-                                       channels=1,
-                                       rate=audio_config.SamplingRate,
-                                       input=True,
-                                       frames_per_buffer=CHUNK)
-
-            time = datetime.datetime.utcnow()
-
-            current_sample_position = 0
-
-             #Read a second worth of data
-            for i in range(0, CHUNKS_PER_SECOND):
-                try:
-                    data_chunk = stream.read(CHUNK)
-
-                    result = Utilities.array_from_bytes(data_chunk, audio_config.SampleBytes, audio_config.NumberFormat)
-
-                    channel1 = result['Channel1']
-                    for j in range(0, CHUNK):
-                        audio_output[current_sample_position] = channel1[j]
-                        current_sample_position += 1
-                except:
-                    print(sys.exc_info())
-                    current_sample_position += CHUNK
-        finally:
-            #close the audio stream
-            stream.stop_stream()
-            stream.close()
-            audio_device.terminate()
-
-        return { "Time": time, "Data": audio_output}
 
     @staticmethod
     def array_from_bytes(data_chunk, sample_width, data_type):
@@ -124,4 +81,55 @@ class Utilities:
             return {'Channel1': channel1, 'Channel2': channel2}
         else:
             return None
+
+    @staticmethod
+    def get_second_of_audio(audio_config):
+        CHUNK = 8000
+
+        audio_device = pyaudio.PyAudio()
+        CHUNKS_PER_SECOND = int(audio_config.SamplingRate / CHUNK)
+
+        audio_output = np.zeros(audio_config.SamplingRate, audio_config.NumberFormat)
+        stream = None
+        time = None
+
+        try:
+            audio_device = pyaudio.PyAudio()
+
+            stream = audio_device.open(format=audio_config.AudioFormat,
+                                       channels=1,
+                                       rate=audio_config.SamplingRate,
+                                       input=True,
+                                       frames_per_buffer=CHUNK)
+
+            time = datetime.datetime.utcnow()
+
+            current_sample_position = 0
+
+             #Read a second worth of data
+            for i in range(0, CHUNKS_PER_SECOND):
+                try:
+                    data_chunk = stream.read(CHUNK)
+
+                    result = Utilities.array_from_bytes(data_chunk, audio_config.SampleBytes, audio_config.NumberFormat)
+
+                    channel1 = result['Channel1']
+                    for j in range(0, CHUNK):
+                        audio_output[current_sample_position] = channel1[j]
+                        current_sample_position += 1
+                except:
+                    print(sys.exc_info())
+                    current_sample_position += CHUNK
+
+            return { "Time": time, "Data": audio_output}
+        except:
+            print("Unable to open audio stream.")
+
+            return { "Time": None, "Data": None}
+        finally:
+            if stream is not None:
+                #close the audio stream
+                stream.stop_stream()
+                stream.close()
+                audio_device.terminate()
 

@@ -69,49 +69,50 @@ class SidDataController:
                 time = audio_result["Time"]
                 data = audio_result["Data"]
 
-                has_sample_data = False
-                for sample in data:
-                    if sample != 0:
-                        has_sample_data = True
-                        break
+                if time is not None and data is not None:
+                    has_sample_data = False
+                    for sample in data:
+                        if sample != 0:
+                            has_sample_data = True
+                            break
 
-                if not has_sample_data:
-                    print("-->No sample data recorded! Check audio connection <--")
-                else:
-                    #store the raw data
-                    dataset_name = time.strftime("%Y%m%d_%H%M%S_%f")
-                    if raw_data_group is not None:
-                        HDF5Utility.add_raw_data_set(raw_data_group, dataset_name, time, self.Config.Audio.NumberFormat, data)
+                    if not has_sample_data:
+                        print("-->No sample data recorded! Check audio connection <--")
+                    else:
+                        #store the raw data
+                        dataset_name = time.strftime("%Y%m%d_%H%M%S_%f")
+                        if raw_data_group is not None:
+                            HDF5Utility.add_raw_data_set(raw_data_group, dataset_name, time, self.Config.Audio.NumberFormat, data)
 
-                    #process the data for power spectral density
-                    Pxx, frequencies = FrequencyUtility.process_psd(data, self.Config.SidWatch.NFFT, self.Config.Audio.SamplingRate)
+                        #process the data for power spectral density
+                        Pxx, frequencies = FrequencyUtility.process_psd(data, self.Config.SidWatch.NFFT, self.Config.Audio.SamplingRate)
 
-                    #store the frequency spectrum
-                    if frequency_spectrum_data_group is not None:
-                        HDF5Utility.add_frequency_spectrum(frequency_spectrum_data_group, dataset_name, time, frequencies, Pxx)
+                        #store the frequency spectrum
+                        if frequency_spectrum_data_group is not None:
+                            HDF5Utility.add_frequency_spectrum(frequency_spectrum_data_group, dataset_name, time, frequencies, Pxx)
 
-                    if stations_group is not None:
-                        #Store the values for each monitored station
-                        for station in self.Config.Stations:
-                            signal_strength = Pxx[station.MonitoredBin]
-                            HDF5Utility.add_signal_strength(station, stations_group, dataset_name, time, signal_strength)
+                        if stations_group is not None:
+                            #Store the values for each monitored station
+                            for station in self.Config.Stations:
+                                signal_strength = Pxx[station.MonitoredBin]
+                                HDF5Utility.add_signal_strength(station, stations_group, dataset_name, time, signal_strength)
 
-                    #determine the next date time to monitor
-                    next_date_time = DateUtility.get_next_run_time(current_time)
-                    sample_count += 1
-                    print("{0} - Read data".format(dataset_name))
+                        #determine the next date time to monitor
+                        next_date_time = DateUtility.get_next_run_time(current_time)
+                        sample_count += 1
+                        print("{0} - Read data".format(dataset_name))
 
-                    #Determine if it is time for a new file
-                    if sample_count >= self.Config.SidWatch.ReadingPerFile:
-                        raw_data_group = None
-                        processed_data_group = None
-                        station_group = None
-                        HDF5Utility.close_file(data_file)
-                        os.rename(filename_temp, filename_final)
+                        #Determine if it is time for a new file
+                        if sample_count >= self.Config.SidWatch.ReadingPerFile:
+                            raw_data_group = None
+                            processed_data_group = None
+                            station_group = None
+                            HDF5Utility.close_file(data_file)
+                            os.rename(filename_temp, filename_final)
 
-                        sample_count = 0
-                        file_opened = False
-                        print("closed file")
+                            sample_count = 0
+                            file_opened = False
+                            print("closed file")
 
                 threadtime.sleep(.1)
 

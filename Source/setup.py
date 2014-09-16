@@ -5,7 +5,7 @@ from cx_Freeze import setup, Executable
 options = {'build_exe': {
     'packages': ['os', 'yaml', 'boto', 'numpy', 'scipy', 'matplotlib', 'io', 'zlib',
                  'zipfile', 'bz2', 'math', 'datetime', 'dateutil', 'time', 'h5py',
-                 'pyaudio', 'sys', 'io'],
+                 'pyaudio', 'sys', 'io', 'simplejson'],
     'include_files': ['Audio/', 'SID/', 'SIDClient/', 'SIDRest/'],
     'excludes': [],
     "build_exe": '../build/Output/Win32/'
