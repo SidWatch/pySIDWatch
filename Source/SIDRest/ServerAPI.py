@@ -14,12 +14,12 @@ class SidWatchAPI:
 
         url = self.Config.SidWatch.SidWatchServerUrl + "accesskey"
 
-        custom_headers = { 'sidwatch-emailaddress':'brian@treegecko.com', 'sidwatch-password':'tester' }
+        custom_headers = {'sidwatch-emailaddress': username,
+                          'sidwatch-password': password}
         response = requests.get(url, headers=custom_headers)
-
         access_key = response.json()
 
-        if ('error' in access_key):
+        if 'error' in access_key:
             return None
         else:
             ak = access_key['accesskey']
