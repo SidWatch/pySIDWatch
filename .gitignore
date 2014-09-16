@@ -3,3 +3,5 @@ Source/Audio/__pycache__/
 Source/SID/__pycache__/
 Source/SIDClient/__pycache__/
 Source/SIDRest/__pycache__/
+build/Output/
+installers/
