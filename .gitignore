@@ -5,3 +5,4 @@ Source/SIDClient/__pycache__/
 Source/SIDRest/__pycache__/
 build/Output/
 installers/
+build/bin/
