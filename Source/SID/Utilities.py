@@ -6,7 +6,7 @@ from SID import Objects
 import datetime as dt
 import math
 import numpy as np
-from matplotlib.mlab import psd
+from scipy import signal
 
 class DateUtility:
     def __init__(self):
@@ -151,4 +151,6 @@ class FrequencyUtility:
         :param audio_sampling_rate:
         :return:
         """
-        return psd(data, nfft, audio_sampling_rate)
+        f, pxx = signal.welch(x=data, NFFT=nfft, fs=audio_sampling_rate)
+
+        return pxx, f
