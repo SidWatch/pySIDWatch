@@ -151,6 +151,47 @@ class FrequencyUtility:
         :param audio_sampling_rate:
         :return:
         """
-        f, pxx = signal.welch(x=data, NFFT=nfft, fs=audio_sampling_rate)
+        f, pxx = signal.welch(x=data, nfft=nfft, fs=audio_sampling_rate)
 
         return pxx, f
+
+class FileUtility:
+    def __init__(self):
+        """
+        Constructor
+        :return:
+        """
+
+    @staticmethod
+    def dump_audio(data, filename):
+        f = open(filename, 'w')
+
+        for element in data:
+            f.printline(element)
+
+        f.close()
+
+    @staticmethod
+    def read_audio(filename):
+        data = []
+
+        f = open(filename, 'r')
+
+        for line in f:
+            data.append(float(line))
+
+        f.close()
+
+        return data
+
+    @staticmethod
+    def dump_psd(filename, frequencies, pxx):
+        f = open(filename, 'w')
+
+        for x in range(0, frequencies.shape[0]):
+            freq = frequencies[x]
+            power = pxx[x]
+
+            f.write(str(freq) + '\t' + str(power) + "\n")
+
+        f.close()
